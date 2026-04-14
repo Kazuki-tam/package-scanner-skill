@@ -1,5 +1,11 @@
 # PackageScanner CLI Reference
 
+## Path contexts
+
+- **Developing this repository:** examples use `node skills/package-scanner-cli/scripts/package_scanner.js` from the repo root.
+- **Installed skill:** from the skill folder (where `SKILL.md` lives), use `node scripts/package_scanner.js`. If `pnpm build` emitted additional modules under `scripts/`, ship them alongside the entry file.
+- **Portable use:** prefer `curl` or inline Node.js below when the helper path is unknown.
+
 ## Hosted API Base URL
 
 ```text

@@ -14,23 +14,31 @@ Use this skill for dependency security checks when the agent should work through
 1. Use `analyze` for full manifest or lockfile scans.
 2. Use `search`, `metadata`, or `vulnerabilities` for a single package investigation.
 3. Prefer lockfile analysis over `package.json` analysis when a supported lockfile exists.
-4. If the current workspace contains `skills/package-scanner-cli/scripts/package_scanner.js`, prefer that helper for local development of this skill repository.
-5. If the helper script is not present in the current workspace, use the raw HTTP patterns in [reference.md](reference.md). Do not assume a repo-relative helper path exists after public installation.
+4. If the helper exists in the workspace, prefer `node scripts/package_scanner.js` from the skill directory, or the repo path below when developing this repository.
+5. If the helper is not present, use the raw HTTP patterns in [reference.md](reference.md). Do not assume a repo-relative helper path after installation.
 
 ## Commands
 
-### Full scan in this repository
+### Full scan (this repository clone)
 
 ```bash
 node skills/package-scanner-cli/scripts/package_scanner.js analyze --lockfile pnpm-lock.yaml --package-json package.json --metadata-check
 ```
 
-### Single package checks in this repository
+### Single package checks (this repository clone)
 
 ```bash
 node skills/package-scanner-cli/scripts/package_scanner.js search --name event-stream --version 3.3.6
 node skills/package-scanner-cli/scripts/package_scanner.js metadata --name react --version 19.1.1
 node skills/package-scanner-cli/scripts/package_scanner.js vulnerabilities --name lodash --version 4.17.20
+```
+
+### Installed skill copy
+
+From the directory that contains `SKILL.md` and `scripts/`:
+
+```bash
+node scripts/package_scanner.js --help
 ```
 
 ## Workflow
@@ -64,8 +72,9 @@ Always summarize:
 
 ### 4. Execution rules
 
-- First choice for this repository: use `scripts/package_scanner.js`
-- First choice for arbitrary public installations: use the raw HTTP examples in [reference.md](reference.md)
+- **This repository clone:** `node skills/package-scanner-cli/scripts/package_scanner.js …`
+- **Installed skill directory:** `node scripts/package_scanner.js …` (keep sibling `.js` files in `scripts/` if the build emitted more than one file)
+- **No helper in workspace:** use the raw HTTP examples in [reference.md](reference.md)
 - For single-package lookups, prefer `curl` because it avoids creating temporary files
 - For full scans without the helper script, use a short inline Node.js snippet that reads the local lockfile and/or `package.json` and posts JSON to `POST /ci/analyze`
 

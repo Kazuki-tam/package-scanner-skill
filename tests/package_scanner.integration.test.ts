@@ -1,36 +1,15 @@
 import { execFile } from "node:child_process";
-import { once } from "node:events";
-import http from "node:http";
 import { promisify } from "node:util";
 
 import { describe, expect, it } from "vitest";
+
+import { withHttpServer } from "./helpers";
 
 const execFileAsync = promisify(execFile);
 const BUILT_CLI_PATH = new URL(
   "../skills/package-scanner-cli/scripts/package_scanner.js",
   import.meta.url,
 );
-
-async function withHttpServer(
-  handler: http.RequestListener,
-  run: (baseUrl: string) => Promise<void>,
-): Promise<void> {
-  const server = http.createServer(handler);
-  server.listen(0, "127.0.0.1");
-  await once(server, "listening");
-
-  const address = server.address();
-  if (!address || typeof address === "string") {
-    throw new Error("Failed to obtain test server address");
-  }
-
-  try {
-    await run(`http://127.0.0.1:${address.port}`);
-  } finally {
-    server.close();
-    await once(server, "close");
-  }
-}
 
 describe("built CLI integration", () => {
   it("prints help from the built artifact", async () => {

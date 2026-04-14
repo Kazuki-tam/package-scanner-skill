@@ -1,5 +1,7 @@
 # PackageScanner CLI Examples
 
+For endpoint details and portable `curl` / Node snippets, see [reference.md](reference.md).
+
 ## Trigger phrases
 
 - "この `pnpm-lock.yaml` を安全性チェックして"

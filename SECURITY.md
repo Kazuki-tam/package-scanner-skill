@@ -30,14 +30,22 @@ This repository does not attempt to:
 
 Please do not open a public issue for undisclosed security vulnerabilities.
 
-Report privately with:
+### GitHub-hosted repositories
+
+Use **Security → Advisories → Report a vulnerability** on this repository so the report stays private until coordinated disclosure.
+
+Include:
 
 - affected file or document
 - reproduction steps
 - expected impact
 - proof of concept if available
 
-If you do not yet have a private reporting channel configured for this repository, add one before publishing broadly.
+Repository maintainers should enable [private vulnerability reporting](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability) on GitHub before promoting this repository broadly.
+
+### If you cannot use GitHub advisories
+
+Contact the repository owners through the security contact or process listed on the hosting platform (for example organization or repository **Security policy**). If none is published yet, add one before wide public distribution.
 
 ## Secure contribution rules
 

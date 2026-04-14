@@ -8,8 +8,8 @@
 - Works in agents that can run shell commands
 - Easy to publish and install with `npx skills add`
 - The published skill directory contains only the files needed at runtime
-- TypeScript source is kept outside the published skill directory while users execute a prebuilt JavaScript helper
-- Portable after installation because the skill can fall back to raw HTTP calls when the repo-local helper path is unavailable
+- TypeScript source lives in the repository under `src/` while users run the prebuilt JavaScript helper under `scripts/`
+- Portable after installation because the skill can fall back to raw HTTP when the helper is not on disk in the current workspace
 
 ## Install
 
@@ -18,8 +18,6 @@ After this repository is published to GitHub, users can install it like this:
 ```bash
 npx skills add <owner>/<repo> --skill package-scanner-cli
 ```
-
-This uses the npm-distributed `skills` CLI through `npx`, so a separate global install is optional.
 
 Or with a full Git URL:
 
@@ -33,12 +31,19 @@ Local testing from this repository:
 npx skills add . --skill package-scanner-cli --list
 ```
 
+## Path contexts (helper vs portable HTTP)
+
+| Context                                 | How to run the helper                                                                                     |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Cloning this repo**                   | From repo root: `node skills/package-scanner-cli/scripts/package_scanner.js …`                            |
+| **After `skills add` copies the skill** | `cd` to the installed skill directory (where `SKILL.md` lives), then: `node scripts/package_scanner.js …` |
+| **Helper missing or unknown path**      | Use `curl` or inline Node.js from [reference.md](reference.md) — do not guess repo-relative paths         |
+
 ## Runtime model
 
-- The repository-level `src/package_scanner.ts` file is the source of truth for development.
-- In this repository, the helper script at `skills/package-scanner-cli/scripts/package_scanner.js` can be used directly.
-- In a public installation, the skill may be copied into an agent-specific directory, so repo-relative paths from the user's workspace are not reliable.
-- Because of that, `SKILL.md` and `reference.md` prefer raw HTTP or inline Node.js when the helper script is not present in the current workspace.
+- `src/` in the repository is the source of truth; `pnpm build` compiles it into `scripts/*.js`.
+- `scripts/package_scanner.js` is the CLI entry point. TypeScript may emit additional `scripts/*.js` modules; keep them together when copying or packaging the skill.
+- In arbitrary workspaces, `SKILL.md` and `reference.md` prefer raw HTTP or inline Node.js when the helper is not present next to the agent.
 
 ## Development
 
@@ -47,9 +52,10 @@ Install dev dependencies and rebuild the distributed helper:
 ```bash
 pnpm install
 pnpm build
+pnpm verify:artifacts
 ```
 
-## Repo-local helper command
+## Repo-local helper (from repository clone)
 
 ```bash
 node skills/package-scanner-cli/scripts/package_scanner.js --help
@@ -57,22 +63,25 @@ node skills/package-scanner-cli/scripts/package_scanner.js --help
 
 ## Files
 
-- `SKILL.md`: activation rules and workflow
-- `reference.md`: endpoint and raw HTTP reference
-- `examples.md`: trigger phrases and usage examples
-- `scripts/package_scanner.js`: Node.js CLI helper for PackageScanner HTTP endpoints
+| File                         | Role                                                                          |
+| ---------------------------- | ----------------------------------------------------------------------------- |
+| `SKILL.md`                   | When to activate and workflow steps                                           |
+| `reference.md`               | Endpoints, payload shape, portable `curl` / Node snippets                     |
+| `examples.md`                | Trigger phrases and example agent behavior                                    |
+| `scripts/package_scanner.js` | CLI entry (Node). Companion `.js` files in `scripts/` are required if present |
 
 ## Extraction target
 
-Recommended public repository structure:
+Layout of this repository (skill files live under `skills/package-scanner-cli/`):
 
 ```text
 package-scanner-skill/
+├── LICENSE
 ├── package.json
 ├── pnpm-lock.yaml
 ├── tsconfig.json
 ├── src/
-│   └── package_scanner.ts
+│   └── …
 └── skills/
     └── package-scanner-cli/
         ├── SKILL.md
@@ -81,6 +90,7 @@ package-scanner-skill/
         ├── reference.md
         └── scripts/
             └── package_scanner.js
+            … (and any other emitted .js from tsc)
 ```
 
 ## Security notes
@@ -95,5 +105,5 @@ package-scanner-skill/
 - Push this repository to a public GitHub repository
 - Verify discovery with `npx skills add <owner>/<repo> --list`
 - Verify targeted install with `npx skills add <owner>/<repo> --skill package-scanner-cli -y`
-- Rebuild `scripts/package_scanner.js` after changing the repository-level `src/package_scanner.ts`
-- Keep `SKILL.md` concise and make sure supporting docs stay one level deep
+- Run `pnpm build` after changing `src/` and commit all generated files under `scripts/`
+- Keep `SKILL.md` concise and supporting docs one level deep

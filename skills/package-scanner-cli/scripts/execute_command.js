@@ -25,6 +25,45 @@ async function fetchAndPrintJson(method, url, context, options = {}) {
 function getOptionalString(value) {
     return typeof value === "string" ? value : undefined;
 }
+async function fetchNamedPackageJson(pathname, { baseUrl, context, options, timeout }) {
+    const url = (0, url_1.buildUrl)(baseUrl, pathname, {
+        name: (0, options_1.requireOption)(options, "name"),
+        version: getOptionalString(options.version),
+    });
+    await fetchAndPrintJson("GET", url, context, { timeout });
+}
+function createGetHandler(pathname) {
+    return async ({ baseUrl, context, timeout }) => {
+        const url = (0, url_1.buildUrl)(baseUrl, pathname);
+        await fetchAndPrintJson("GET", url, context, { timeout });
+    };
+}
+function createNamedPackageHandler(pathname) {
+    return async (runtime) => {
+        await fetchNamedPackageJson(pathname, runtime);
+    };
+}
+function createReportHandler() {
+    return async ({ baseUrl, context, options, timeout }) => {
+        const url = (0, url_1.buildUrl)(baseUrl, `/report/${(0, options_1.requireOption)(options, "analysisId")}`);
+        await fetchAndPrintJson("GET", url, context, { timeout });
+    };
+}
+function createAnalyzeHandler() {
+    return async ({ baseUrl, context, options, timeout }) => {
+        const url = (0, url_1.buildUrl)(baseUrl, "/ci/analyze");
+        const payload = (0, analyze_payload_1.createAnalyzePayload)(options, context.readText);
+        await fetchAndPrintJson("POST", url, context, { payload, timeout });
+    };
+}
+const COMMAND_HANDLERS = {
+    health: createGetHandler("/health"),
+    search: createNamedPackageHandler("/malware-db/search"),
+    metadata: createNamedPackageHandler("/package/metadata"),
+    vulnerabilities: createNamedPackageHandler("/package/vulnerabilities"),
+    report: createReportHandler(),
+    analyze: createAnalyzeHandler(),
+};
 async function executeCommand(argv, contextOverrides = {}) {
     const parsed = (0, argv_1.parseArgv)(argv);
     const context = createCommandContext(contextOverrides);
@@ -34,45 +73,14 @@ async function executeCommand(argv, contextOverrides = {}) {
     }
     const timeout = (0, options_1.getTimeout)(parsed.options.timeout);
     const baseUrl = (0, options_1.getBaseUrl)(parsed.options.baseUrl);
-    const commandHandlers = {
-        health: async () => {
-            const url = (0, url_1.buildUrl)(baseUrl, "/health");
-            await fetchAndPrintJson("GET", url, context, { timeout });
-        },
-        search: async () => {
-            const url = (0, url_1.buildUrl)(baseUrl, "/malware-db/search", {
-                name: (0, options_1.requireOption)(parsed.options, "name"),
-                version: getOptionalString(parsed.options.version),
-            });
-            await fetchAndPrintJson("GET", url, context, { timeout });
-        },
-        metadata: async () => {
-            const url = (0, url_1.buildUrl)(baseUrl, "/package/metadata", {
-                name: (0, options_1.requireOption)(parsed.options, "name"),
-                version: getOptionalString(parsed.options.version),
-            });
-            await fetchAndPrintJson("GET", url, context, { timeout });
-        },
-        vulnerabilities: async () => {
-            const url = (0, url_1.buildUrl)(baseUrl, "/package/vulnerabilities", {
-                name: (0, options_1.requireOption)(parsed.options, "name"),
-                version: getOptionalString(parsed.options.version),
-            });
-            await fetchAndPrintJson("GET", url, context, { timeout });
-        },
-        report: async () => {
-            const url = (0, url_1.buildUrl)(baseUrl, `/report/${(0, options_1.requireOption)(parsed.options, "analysisId")}`);
-            await fetchAndPrintJson("GET", url, context, { timeout });
-        },
-        analyze: async () => {
-            const url = (0, url_1.buildUrl)(baseUrl, "/ci/analyze");
-            const payload = (0, analyze_payload_1.createAnalyzePayload)(parsed.options, context.readText);
-            await fetchAndPrintJson("POST", url, context, { payload, timeout });
-        },
-    };
-    const handler = commandHandlers[parsed.command];
+    const handler = COMMAND_HANDLERS[parsed.command];
     if (!handler) {
         (0, cli_error_1.fail)(`Unknown command: ${parsed.command}`);
     }
-    await handler();
+    await handler({
+        baseUrl,
+        context,
+        options: parsed.options,
+        timeout,
+    });
 }
