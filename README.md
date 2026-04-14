@@ -2,11 +2,9 @@
 
 Public `skills` ecosystem repository for `package-scanner-cli`.
 
-This skill helps coding agents use the public PackageScanner service to scan npm manifests and lockfiles, search packages for malware history, inspect registry metadata signals, and check published vulnerabilities.
-
-## License
-
-This project is licensed under the MIT License — see [LICENSE](LICENSE).
+This skill helps coding agents use the public PackageScanner service to scan npm
+manifests and lockfiles, search packages for malware history, inspect registry
+metadata signals, and check published vulnerabilities.
 
 ## Install with `skills`
 
@@ -56,14 +54,22 @@ skills/
 
 ## Notes
 
-- The published skill is portable: it can use raw HTTP calls when the helper script is not available at a repo-relative path.
-- TypeScript source lives under `src/`, outside the published skill directory root that users copy.
-- The distributed helper is built into `skills/package-scanner-cli/scripts/`. Run `pnpm build` after changing `src/`; it clears old generated `.js` files first.
-- PackageScanner itself supports scanning uploaded manifests and lockfiles, package search, and report sharing through its web flow and related integrations.
+- The published skill is portable: it can use raw HTTP calls when the helper
+  script is not available at a repo-relative path.
+- TypeScript source lives under `src/`, outside the published skill directory
+  root that users copy.
+- The distributed helper is built into `skills/package-scanner-cli/scripts/`.
+  Run `pnpm build` after changing `src/`; it clears old generated `.js` files
+  first.
+- PackageScanner itself supports scanning uploaded manifests and lockfiles,
+  package search, and report sharing through its web flow and related
+  integrations.
 
 ## Security
 
-Summary: the helper uses only Node.js stdlib; full scans upload selected files you pass to the public API. Never send credentials or `.npmrc`. For details and how to report vulnerabilities, see [SECURITY.md](SECURITY.md).
+Summary: the helper uses only Node.js stdlib; full scans upload selected files
+you pass to the public API. Never send credentials or `.npmrc`. For details and
+how to report vulnerabilities, see [SECURITY.md](SECURITY.md).
 
 ## Local validation
 
@@ -74,3 +80,7 @@ pnpm verify:artifacts
 npx skills add . --skill package-scanner-cli --list
 node skills/package-scanner-cli/scripts/package_scanner.js health
 ```
+
+## License
+
+This project is licensed under the MIT License — see [LICENSE](LICENSE).
