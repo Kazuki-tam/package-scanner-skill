@@ -55,6 +55,8 @@ node scripts/package_scanner.js --help
 ### 2. Input rules
 
 - Supported lockfiles: `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, `bun.lock`
+- `--package-json` only accepts files named `package.json`
+- Reject sensitive filenames such as `.npmrc`, `.env*`, and `credentials.json`
 - Do not use `bun.lockb`
 - Pass `--metadata-check` only when `package.json` is available
 - For a full dependency scan, only send files after confirming it is acceptable to upload the manifest or lockfile to the public PackageScanner service

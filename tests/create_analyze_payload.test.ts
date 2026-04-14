@@ -3,20 +3,25 @@ import { describe, expect, it } from "vitest";
 import { createAnalyzePayload } from "../src/package_scanner";
 
 describe("createAnalyzePayload", () => {
-  it("infers the package manager from the lockfile name", () => {
+  it.each([
+    ["package-lock.json", "npm"],
+    ["pnpm-lock.yaml", "pnpm"],
+    ["yarn.lock", "yarn"],
+    ["bun.lock", "bun"],
+  ])("accepts supported lockfiles and infers %s as %s", (lockfileName, manager) => {
     const payload = createAnalyzePayload(
       {
-        lockfile: "/tmp/pnpm-lock.yaml",
-        packageJson: "/tmp/package.json",
+        lockfile: `/tmp/nested/${lockfileName}`,
+        packageJson: "/tmp/project/package.json",
         metadataCheck: true,
       },
       (filePath) => `${filePath}-content`,
     );
 
     expect(payload).toEqual({
-      lockfileContent: "/tmp/pnpm-lock.yaml-content",
-      manager: "pnpm",
-      packageJsonContent: "/tmp/package.json-content",
+      lockfileContent: `/tmp/nested/${lockfileName}-content`,
+      manager,
+      packageJsonContent: "/tmp/project/package.json-content",
       options: { enableMetadataCheck: true },
     });
   });
@@ -34,58 +39,88 @@ describe("createAnalyzePayload", () => {
     });
   });
 
-  it("accepts an explicit manager when inference is not possible", () => {
-    expect(
-      createAnalyzePayload(
-        {
-          lockfile: "/tmp/custom.lock",
-          manager: "bun",
-        },
-        () => "lock-content",
-      ),
-    ).toEqual({
-      lockfileContent: "lock-content",
-      manager: "bun",
-    });
+  it.each([
+    [{}, "Provide --lockfile and/or --package-json."],
+    [
+      {
+        lockfile: "/tmp/unknown.lock",
+      },
+      "--lockfile only accepts package-lock.json, pnpm-lock.yaml, yarn.lock, or bun.lock.",
+    ],
+    [
+      {
+        lockfile: "/tmp/custom.lock",
+        manager: "bun",
+      },
+      "--lockfile only accepts package-lock.json, pnpm-lock.yaml, yarn.lock, or bun.lock.",
+    ],
+    [
+      {
+        lockfile: "/tmp/package-lock.json",
+        manager: "composer",
+      },
+      "--manager must be one of npm, pnpm, yarn, bun.",
+    ],
+    [
+      {
+        lockfile: "/tmp/package-lock.json",
+        metadataCheck: true,
+      },
+      "--metadata-check requires --package-json.",
+    ],
+    [
+      {
+        lockfile: "/tmp/bun.lockb",
+      },
+      "bun.lockb is not supported. Use bun.lock text format instead.",
+    ],
+    [
+      {
+        packageJson: "/tmp/app.json",
+      },
+      "--package-json only accepts files named package.json.",
+    ],
+  ])("rejects invalid analyze options: %j", (options, message) => {
+    expect(() => createAnalyzePayload(options, () => "unused")).toThrow(message);
   });
 
-  it("rejects invalid analyze argument combinations", () => {
-    expect(() => createAnalyzePayload({}, () => "unused")).toThrow(
-      "Provide --lockfile and/or --package-json.",
-    );
+  it.each([
+    [
+      {
+        packageJson: "/tmp/.env.production",
+      },
+      "Refusing to send sensitive file via --package-json: .env.production",
+    ],
+    [
+      {
+        lockfile: "/tmp/.npmrc",
+      },
+      "Refusing to send sensitive file via --lockfile: .npmrc",
+    ],
+    [
+      {
+        lockfile: "/tmp/secrets/credentials.json",
+      },
+      "Refusing to send sensitive file via --lockfile: credentials.json",
+    ],
+    [
+      {
+        packageJson: "/tmp/.ssh/id_ed25519",
+      },
+      "Refusing to send sensitive file via --package-json: id_ed25519",
+    ],
+  ])("rejects sensitive filenames: %j", (options, message) => {
+    expect(() => createAnalyzePayload(options, () => "unused")).toThrow(message);
+  });
+
+  it("prioritizes sensitive filename rejection over generic basename errors", () => {
     expect(() =>
       createAnalyzePayload(
         {
-          lockfile: "/tmp/unknown.lock",
+          packageJson: "/tmp/.env",
         },
         () => "unused",
       ),
-    ).toThrow("Could not infer package manager. Pass --manager explicitly.");
-    expect(() =>
-      createAnalyzePayload(
-        {
-          lockfile: "/tmp/package-lock.json",
-          manager: "composer",
-        },
-        () => "unused",
-      ),
-    ).toThrow("--manager must be one of npm, pnpm, yarn, bun.");
-    expect(() =>
-      createAnalyzePayload(
-        {
-          lockfile: "/tmp/package-lock.json",
-          metadataCheck: true,
-        },
-        () => "unused",
-      ),
-    ).toThrow("--metadata-check requires --package-json.");
-    expect(() =>
-      createAnalyzePayload(
-        {
-          lockfile: "/tmp/bun.lockb",
-        },
-        () => "unused",
-      ),
-    ).toThrow("bun.lockb is not supported. Use bun.lock text format instead.");
+    ).toThrow("Refusing to send sensitive file via --package-json: .env");
   });
 });

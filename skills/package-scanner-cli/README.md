@@ -96,6 +96,9 @@ package-scanner-skill/
 ## Security notes
 
 - The helper sends only the files you explicitly pass as `--lockfile` and `--package-json`.
+- `--package-json` only accepts files named `package.json`.
+- `--lockfile` only accepts `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, or `bun.lock`.
+- The helper rejects sensitive filenames such as `.npmrc`, `.env*`, and `credentials.json`.
 - Never send `.npmrc`, access tokens, private registry credentials, or environment files.
 - Full scans upload manifest content to the public PackageScanner API, so confirm before scanning private repositories.
 - Scan results are indicators, not proof of compromise.

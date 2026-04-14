@@ -17,6 +17,7 @@ Security fixes are applied to the latest version on the default branch. Older sn
 - Full scans may upload a selected lockfile and optionally `package.json` to `https://www.package-scanner.dev/api`
 - Single-package lookups send only the package name and optional version
 - The helper must not read or transmit `.npmrc`, tokens, environment files, or private registry credentials unless a contributor intentionally changes the code to do so
+- The helper now validates analyze inputs and only accepts `package.json` plus supported lockfile basenames; it rejects sensitive filenames such as `.npmrc`, `.env*`, and `credentials.json`
 
 ## Security boundaries
 

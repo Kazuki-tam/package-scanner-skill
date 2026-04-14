@@ -68,8 +68,11 @@ skills/
 ## Security
 
 Summary: the helper uses only Node.js stdlib; full scans upload selected files
-you pass to the public API. Never send credentials or `.npmrc`. For details and
-how to report vulnerabilities, see [SECURITY.md](SECURITY.md).
+you pass to the public API. The helper only accepts `package.json` for
+`--package-json` and `package-lock.json` / `pnpm-lock.yaml` / `yarn.lock` /
+`bun.lock` for `--lockfile`, and it rejects `.npmrc`, `.env*`, and similar
+sensitive filenames. For details and how to report vulnerabilities, see
+[SECURITY.md](SECURITY.md).
 
 ## Local validation
 

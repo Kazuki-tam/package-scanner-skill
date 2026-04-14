@@ -130,6 +130,9 @@ Rules:
 - At least one of `lockfileContent` or `packageJsonContent` is required.
 - `manager` is required when `lockfileContent` is present.
 - `enableMetadataCheck` requires `packageJsonContent`.
+- Helper CLI validation accepts only `package.json` for `--package-json`.
+- Helper CLI validation accepts only `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, or `bun.lock` for `--lockfile`.
+- Helper CLI validation rejects sensitive filenames such as `.npmrc`, `.env*`, and `credentials.json`.
 - `bun.lockb` is not supported.
 
 ## Fallback curl example
