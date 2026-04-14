@@ -16,13 +16,13 @@
 After this repository is published to GitHub, users can install it like this:
 
 ```bash
-npx skills add <owner>/<repo> --skill package-scanner-cli
+npx skills add Kazuki-tam/package-scanner-skill --skill package-scanner-cli
 ```
 
 Or with a full Git URL:
 
 ```bash
-npx skills add https://github.com/<owner>/<repo> --skill package-scanner-cli
+npx skills add https://github.com/Kazuki-tam/package-scanner-skill --skill package-scanner-cli
 ```
 
 Local testing from this repository:
@@ -103,7 +103,7 @@ package-scanner-skill/
 ## Publish checklist
 
 - Push this repository to a public GitHub repository
-- Verify discovery with `npx skills add <owner>/<repo> --list`
-- Verify targeted install with `npx skills add <owner>/<repo> --skill package-scanner-cli -y`
+- Verify discovery with `npx skills add Kazuki-tam/package-scanner-skill --list`
+- Verify targeted install with `npx skills add Kazuki-tam/package-scanner-skill --skill package-scanner-cli -y`
 - Run `pnpm build` after changing `src/` and commit all generated files under `scripts/`
 - Keep `SKILL.md` concise and supporting docs one level deep

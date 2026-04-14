@@ -14,13 +14,13 @@ You do not need a global install. Run the `skills` CLI from npm with `npx`:
 
 ```bash
 # List skills in this repository
-npx skills add <owner>/<repo> --list
+npx skills add Kazuki-tam/package-scanner-skill --list
 
 # Install the PackageScanner skill
-npx skills add <owner>/<repo> --skill package-scanner-cli
+npx skills add Kazuki-tam/package-scanner-skill --skill package-scanner-cli
 
 # Optional: global install
-npx skills add <owner>/<repo> --skill package-scanner-cli -g
+npx skills add Kazuki-tam/package-scanner-skill --skill package-scanner-cli -g
 ```
 
 ## Documentation map
