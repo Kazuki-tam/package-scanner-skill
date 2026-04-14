@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "endOfLine": "lf",
+  "printWidth": 100,
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "ignorePatterns": [
+    ".claude/",
+    ".cursor/",
+    "node_modules/",
+    "coverage/",
+    "skills/package-scanner-cli/scripts/"
+  ]
+}

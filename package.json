@@ -1,0 +1,26 @@
+{
+  "name": "package-scanner-skill",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Public skills repository for PackageScanner.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint --tsconfig tsconfig.json .",
+    "lint:fix": "oxlint --tsconfig tsconfig.json --fix .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --pretty false"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@vitest/coverage-v8": "^4.1.4",
+    "oxfmt": "^0.45.0",
+    "oxlint": "^1.60.0",
+    "typescript": "^5.9.2",
+    "vitest": "^4.1.4"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

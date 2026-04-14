@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": {
+    "node": true
+  },
+  "ignorePatterns": [
+    ".claude/",
+    ".cursor/",
+    "node_modules/",
+    "coverage/",
+    "skills/package-scanner-cli/scripts/"
+  ]
+}
