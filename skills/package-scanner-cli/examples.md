@@ -4,11 +4,11 @@ For endpoint details and portable `curl` / Node snippets, see [reference.md](ref
 
 ## Trigger phrases
 
-- "この `pnpm-lock.yaml` を安全性チェックして"
-- "`package.json` の依存関係に危険なものがないか見て"
-- "`event-stream@3.3.6` はマルウェア判定されている?"
-- "この npm パッケージ、脆弱性や怪しい公開時期がないか調べて"
-- "supply-chain risk を CLI で見て"
+- "Check this `pnpm-lock.yaml` for security issues"
+- "Are there any risky dependencies in `package.json`?"
+- "Is `event-stream@3.3.6` flagged as malware?"
+- "Look up this npm package for vulnerabilities or suspicious release timing"
+- "Check supply-chain risk with the CLI"
 
 ## Example agent behavior
 

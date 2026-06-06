@@ -20,7 +20,7 @@ export async function withHttpServer(
   run: (baseUrl: string) => Promise<void>,
 ): Promise<void> {
   const server = http.createServer(handler);
-  server.listen(0, "127.0.0.1");
+  server.listen(0, "127.0.0.1"); // shk-ignore pii.ipv4
   await once(server, "listening");
 
   const address = server.address();
